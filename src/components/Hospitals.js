@@ -1,62 +1,55 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { FaHospital, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaAmbulance, FaHeartbeat, FaWheelchair, FaHospital } from 'react-icons/fa';
 
-const HospitalCard = ({ name, address, phone }) => (
+const ServiceCard = ({ icon: Icon, title, description }) => (
   <motion.div
     whileHover={{ scale: 1.05 }}
-    className="card p-6"
+    className="card p-6 flex flex-col items-center text-center"
   >
-    <FaHospital className="text-4xl text-seva-red dark:text-seva-blue mb-4" />
-    <h3 className="text-xl font-semibold mb-2">{name}</h3>
-    <p className="flex items-center mb-2">
-      <FaMapMarkerAlt className="mr-2 text-seva-gray" />
-      {address}
-    </p>
-    <p className="flex items-center">
-      <FaPhone className="mr-2 text-seva-gray" />
-      {phone}
-    </p>
+    <Icon className="text-5xl text-seva-red dark:text-seva-blue mb-4" />
+    <h3 className="text-xl font-semibold mb-2">{title}</h3>
+    <p>{description}</p>
   </motion.div>
 );
 
-const Hospitals = () => {
+const Services = () => {
   const { t } = useTranslation();
 
-  const hospitals = [
+  const services = [
     {
-      name: "City General Hospital",
-      address: "123 Main St, Tumakuru",
-      phone: "+91 1234567890"
+      icon: FaAmbulance,
+      title: t('services.emergency.title'),
+      description: t('services.emergency.description'),
     },
     {
-      name: "Lifeline Medical Center",
-      address: "456 Park Ave, Tumakuru",
-      phone: "+91 9876543210"
+      icon: FaHeartbeat,
+      title: t('services.criticalCare.title'),
+      description: t('services.criticalCare.description'),
     },
     {
-      name: "Sunshine Hospital",
-      address: "789 Oak Rd, Tumakuru",
-      phone: "+91 5555555555"
+      icon: FaWheelchair,
+      title: t('services.nonEmergency.title'),
+      description: t('services.nonEmergency.description'),
     },
     {
-      name: "Care & Cure Hospital",
-      address: "321 Pine St, Tumakuru",
-      phone: "+91 9999999999"
-    }
+      icon: FaHospital,
+      title: t('services.transfer.title'),
+      description: t('services.transfer.description'),
+    },
   ];
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <h2 className="section-title text-center mb-12">{t('hospitals.title')}</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {hospitals.map((hospital, index) => (
-          <HospitalCard key={index} {...hospital} />
+      <h2 className="section-title text-center mb-12">{t('services.title')}</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {services.map((service, index) => (
+          <ServiceCard key={index} {...service} />
         ))}
       </div>
     </div>
   );
 };
 
-export default Hospitals;
+export default Services;

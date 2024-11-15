@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { startTransition } from 'react';
 import { motion } from 'framer-motion';
 import { FaCalendar, FaUser } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import Section from './Section';
 
 const BlogPost = ({ title, date, author, excerpt }) => {
   const { t } = useTranslation();
@@ -25,6 +26,7 @@ const BlogPost = ({ title, date, author, excerpt }) => {
     </motion.div>
   );
 };
+
 const Blog = () => {
   const { t } = useTranslation();
 
@@ -50,14 +52,15 @@ const Blog = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h2 className="section-title text-center mb-12">{t('blog.title')}</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {blogPosts.map((post, index) => (
-          <BlogPost key={index} {...post} />
-        ))}
+    <Section id="blog" title={t('blog.title')}>
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {blogPosts.map((post, index) => (
+            <BlogPost key={index} {...post} />
+          ))}
+        </div>
       </div>
-    </div>
+    </Section>
   );
 };
 

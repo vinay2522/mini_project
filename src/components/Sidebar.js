@@ -1,40 +1,45 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { FaHome, FaAmbulance, FaHospital, FaBlog, FaImages, FaDownload, FaQuestionCircle } from 'react-icons/fa';
+// Sidebar.js
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const Sidebar = () => {
-  const location = useLocation();
-
+  const [isOpen, setIsOpen] = useState(true);
   const menuItems = [
-    { path: '/', icon: FaHome, text: 'Home' },
-    { path: '/services', icon: FaAmbulance, text: 'Services' },
-    { path: '/hospitals', icon: FaHospital, text: 'Hospitals' },
-    { path: '/blog', icon: FaBlog, text: 'Blog' },
-    { path: '/gallery', icon: FaImages, text: 'Gallery' },
-    { path: '/download', icon: FaDownload, text: 'Download' },
-    { path: '/help-desk', icon: FaQuestionCircle, text: 'Help Desk' },
+    { title: 'Home', path: '/' },
+    { title: 'Services', path: '/services' },
+    { title: 'Hospitals', path: '/hospitals' },
+    { title: 'Blog', path: '/blog' },
+    { title: 'Gallery', path: '/gallery' },
+    { title: 'Download', path: '/download' },
+    { title: 'Help Desk', path: '/helpdesk' },
   ];
 
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <aside className="bg-red-100 w-16 md:w-64 min-h-screen p-4 transition-all duration-300">
-      <nav>
-        <ul className="space-y-2">
-          {menuItems.map((item) => (
-            <li key={item.path}>
-              <Link
-                to={item.path}
-                className={`flex items-center py-2 px-4 rounded transition-colors duration-200 hover:bg-red-200 ${
-                  location.pathname === item.path ? 'bg-red-200 text-red-600' : 'text-gray-700'
-                }`}
-              >
-                <item.icon className="mr-2 text-xl" />
-                <span className="hidden md:inline">{item.text}</span>
-              </Link>
+    <div className="flex">
+      <motion.div
+        animate={{
+          width: isOpen ? '16rem' : '4rem',
+          transition: { duration: 0.3 },
+        }}
+        className="sidebar"
+      >
+        <button onClick={toggleSidebar}>
+          {isOpen ? 'Close' : 'Open'}
+        </button>
+        <ul>
+          {menuItems.map((item, index) => (
+            <li key={index}>
+              <Link to={item.path}>{item.title}</Link>
             </li>
           ))}
         </ul>
-      </nav>
-    </aside>
+      </motion.div>
+    </div>
   );
 };
 
