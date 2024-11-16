@@ -13,7 +13,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-
+app.set('trust proxy', 1);
 // Rate limiting
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -59,16 +59,6 @@ const contactSchema = new mongoose.Schema({
 });
 
 const Contact = mongoose.model('Contact', contactSchema);
-
-// Booking Schema
-const bookingSchema = new mongoose.Schema({
-    emergencyType: { type: String, required: true },
-    latitude: { type: Number, required: true },
-    longitude: { type: Number, required: true },
-    createdAt: { type: Date, default: Date.now }
-});
-
-const Booking = mongoose.model('Booking', bookingSchema);
 
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
@@ -328,32 +318,6 @@ app.post('/api/contact', async (req, res) => {
         );
 
         res.status(201).json({ message: 'Message sent successfully' });
-
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-});
-
-// Booking endpoint
-app.post('/api/bookings', async (req, res) => {
-    try {
-        const { emergencyType, latitude, longitude } = req.body;
-
-        // Validate input
-        if (!emergencyType || latitude == null || longitude == null) {
-            return res.status(400).json({ message: 'All fields are required' });
-        }
-
-        // Save booking
-        const booking = new Booking({
-            emergencyType,
-            latitude,
-            longitude
-        });
-
-        await booking.save();
-
-        res.status(201).json({ message: 'Booking successful' });
 
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
