@@ -4,6 +4,7 @@ import { FaAmbulance, FaUserMd, FaPhoneAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import Section from './Section';
 import MissionSection from './MissionSection';
+import ContactForm from './ContactForm'; // Import the ContactForm component
 
 const Home = () => {
   const navigate = useNavigate();
@@ -16,9 +17,9 @@ const Home = () => {
 
   return (
     <Section id="home" title="Home">
-      <div className="space-y-16">
+      <div className="space-y-8"> {/* Reduced gap between sections */}
         {/* Hero Section */}
-        <section className="hero gradient-bg text-white p-8 rounded-lg">
+        <section className="hero gradient-bg text-white p-8 rounded-lg mb-8"> {/* Added mb-8 for bottom margin */}
           <h2 className="text-4xl font-bold mb-4 text-shadow">
             DRIVING CARE IN HEALTHCARE across Tumakuru
           </h2>
@@ -36,7 +37,7 @@ const Home = () => {
 
         {/* About Us Section */}
         <Element name="about">
-          <Section id="about" title="About Us">
+          <Section id="about" title="About Us" className="mb-8"> {/* Added mb-8 for bottom margin */}
             <p className="text-lg">
               SevaDrive is committed to providing high-quality ambulance services in Tumakuru. Our team of trained
               professionals ensures that patients receive the best care during transportation.
@@ -61,7 +62,7 @@ const Home = () => {
 
         {/* Who We Are Section */}
         <Element name="who-we-are">
-          <Section id="who-we-are" title="Who We Are">
+          <Section id="who-we-are" title="Who We Are" className="mb-8"> {/* Added mb-8 for bottom margin */}
             <p className="text-lg">
               We are a dedicated team of healthcare professionals and drivers working together to provide timely and
               efficient ambulance services. Our mission is to save lives and ensure patient comfort during medical
@@ -72,30 +73,8 @@ const Home = () => {
 
         {/* Contact Section */}
         <Element name="contact">
-          <Section id="contact" title="Connect With Us">
-            <form className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block mb-1">
-                  Name
-                </label>
-                <input type="text" id="name" className="w-full p-2 border rounded text-gray-800" />
-              </div>
-              <div>
-                <label htmlFor="email" className="block mb-1">
-                  Email
-                </label>
-                <input type="email" id="email" className="w-full p-2 border rounded text-gray-800" />
-              </div>
-              <div>
-                <label htmlFor="message" className="block mb-1">
-                  Message
-                </label>
-                <textarea id="message" rows="4" className="w-full p-2 border rounded text-gray-800"></textarea>
-              </div>
-              <button type="submit" className="bg-white text-red-600 px-6 py-2 rounded hover:bg-red-100 hover-scale">
-                Send
-              </button>
-            </form>
+          <Section id="contact" title="Connect With Us" className="mb-8"> {/* Added mb-8 for bottom margin */}
+            <ContactForm />
           </Section>
         </Element>
       </div>

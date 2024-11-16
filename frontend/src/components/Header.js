@@ -68,7 +68,7 @@ const Header = () => {
               </div>
             ) : (
               <Link to="/login" className="btn btn-primary">
-                {t('login.title')}
+                {t('login')}
               </Link>
             )
           )}

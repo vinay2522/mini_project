@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = () => {
-  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // Redirect or update UI
+      const response = await axios.post('/api/login', { email, password });
+      // Handle successful login (e.g., save token, redirect to dashboard)
+      navigate('/dashboard');
     } catch (error) {
-      setError(error.message);
+      setError(error.response.data.message);
     }
   };
 
@@ -29,11 +28,11 @@ const Login = () => {
         transition={{ duration: 0.5 }}
         className="max-w-md mx-auto card"
       >
-        <h2 className="section-title text-center mb-8">{t('login.title')}</h2>
+        <h2 className="section-title text-center mb-8">Login</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block mb-1 font-semibold">{t('login.email')}</label>
+            <label htmlFor="email" className="block mb-1 font-semibold">Email</label>
             <input
               type="email"
               id="email"
@@ -44,7 +43,7 @@ const Login = () => {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block mb-1 font-semibold">{t('login.password')}</label>
+            <label htmlFor="password" className="block mb-1 font-semibold">Password</label>
             <input
               type="password"
               id="password"
@@ -55,16 +54,11 @@ const Login = () => {
             />
           </div>
           <button type="submit" className="btn btn-primary w-full">
-            {t('login.submit')}
+            Login
           </button>
         </form>
         <p className="mt-4 text-center">
-          <Link to="/forgot-password" className="text-seva-red dark:text-seva-blue hover:underline">
-            {t('login.forgotPassword')}
-          </Link>
-        </p>
-        <p className="mt-4 text-center">
-          {t('login.noAccount')} <Link to="/register" className="text-seva-red dark:text-seva-blue hover:underline">{t('login.register')}</Link>
+          Don't have an account? <Link to="/register" className="text-seva-red dark:text-seva-blue hover:underline">Register</Link>
         </p>
       </motion.div>
     </div>

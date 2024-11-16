@@ -1,6 +1,6 @@
-// src/Components/BookingForm.js
 import React, { useState } from 'react';
 import './BookingForm.css';
+import axios from 'axios';
 
 const BookingForm = () => {
   const [step, setStep] = useState(1);
@@ -54,21 +54,14 @@ const BookingForm = () => {
 
   const handleBooking = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/bookings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bookingData),
-      });
-
-      if (!response.ok) {
+      const response = await axios.post('/api/bookings', bookingData);
+      if (response.status === 201) {
+        setSuccess(true);
+        setLoading(false);
+        setStep(3);
+      } else {
         throw new Error('Booking failed');
       }
-
-      setSuccess(true);
-      setLoading(false);
-      setStep(3);
     } catch (err) {
       setError('Failed to book ambulance. Please try again.');
       setLoading(false);

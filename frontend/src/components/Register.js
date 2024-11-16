@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import axios from 'axios';
 
 const Register = () => {
-  const { t } = useTranslation();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,14 +13,14 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setError(t('register.passwordMismatch'));
+      setError('Passwords do not match');
       return;
     }
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      // Redirect or update UI
+      const response = await axios.post('/api/register', { name, email, password });
+      // Handle successful registration (e.g., redirect to login page)
     } catch (error) {
-      setError(error.message);
+      setError(error.response.data.message);
     }
   };
 
@@ -34,11 +32,22 @@ const Register = () => {
         transition={{ duration: 0.5 }}
         className="max-w-md mx-auto card"
       >
-        <h2 className="section-title text-center mb-8">{t('register.title')}</h2>
+        <h2 className="section-title text-center mb-8">Register</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block mb-1 font-semibold">{t('register.email')}</label>
+            <label htmlFor="name" className="block mb-1 font-semibold">Name</label>
+            <input
+              type="text"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="input"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="block mb-1 font-semibold">Email</label>
             <input
               type="email"
               id="email"
@@ -49,7 +58,7 @@ const Register = () => {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block mb-1 font-semibold">{t('register.password')}</label>
+            <label htmlFor="password" className="block mb-1 font-semibold">Password</label>
             <input
               type="password"
               id="password"
@@ -60,7 +69,7 @@ const Register = () => {
             />
           </div>
           <div>
-            <label htmlFor="confirmPassword" className="block mb-1 font-semibold">{t('register.confirmPassword')}</label>
+            <label htmlFor="confirmPassword" className="block mb-1 font-semibold">Confirm Password</label>
             <input
               type="password"
               id="confirmPassword"
@@ -71,11 +80,11 @@ const Register = () => {
             />
           </div>
           <button type="submit" className="btn btn-primary w-full">
-            {t('register.submit')}
+            Register
           </button>
         </form>
         <p className="mt-4 text-center">
-          {t('register.haveAccount')} <Link to="/login" className="text-seva-red dark:text-seva-blue hover:underline">{t('register.login')}</Link>
+          Already have an account? <Link to="/login" className="text-seva-red dark:text-seva-blue hover:underline">Login</Link>
         </p>
       </motion.div>
     </div>
