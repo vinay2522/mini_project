@@ -1,0 +1,209 @@
+/* src/styles/global.css */
+
+/* Import Tailwind CSS */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Import fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+.input {
+    @apply w-full px-4 py-2 rounded-md border border-[#d3d3d3] focus:outline-none focus:ring-2 focus:ring-[#0000ff];
+  }
+  
+
+/* Custom variables */
+:root {
+  --color-seva-red: #FF4136;
+  --color-seva-blue: #0074D9;
+  --color-seva-gray: #AAAAAA;
+  --color-seva-light: #F8F9FA;
+  --color-seva-dark: #343A40;
+}
+
+/* Base styles */
+body {
+  font-family: 'Poppins', sans-serif;
+  @apply bg-seva-light text-seva-dark;
+}
+
+.dark body {
+  @apply bg-seva-dark text-seva-light;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Custom utility classes */
+.gradient-bg {
+  background: linear-gradient(135deg, var(--color-seva-red), var(--color-seva-blue));
+}
+
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hover-scale {
+  @apply transition-transform duration-300 ease-in-out;
+}
+
+.hover-scale:hover {
+  @apply transform scale-105;
+}
+
+/* Component styles */
+.btn {
+  @apply px-6 py-2 rounded-full font-semibold transition-colors duration-300 ease-in-out;
+}
+
+.btn-primary {
+  @apply bg-seva-red text-white hover:bg-seva-blue;
+}
+
+.btn-secondary {
+  @apply bg-seva-blue text-white hover:bg-seva-red;
+}
+
+.card {
+  @apply bg-white dark:bg-seva-dark rounded-lg shadow-md p-6;
+}
+
+.input {
+  @apply w-full px-4 py-2 rounded-md border border-seva-gray focus:outline-none focus:ring-2 focus:ring-seva-blue;
+}
+
+.section-title {
+  @apply text-3xl font-bold mb-6 text-seva-red dark:text-seva-blue;
+}
+
+/* Header styles */
+.header {
+  @apply bg-white dark:bg-seva-dark shadow-md;
+}
+
+.header-nav {
+  @apply flex items-center space-x-6;
+}
+
+.header-link {
+  @apply text-seva-dark dark:text-seva-light hover:text-seva-red dark:hover:text-seva-blue transition-colors duration-300;
+}
+
+/* Footer styles */
+.footer {
+  @apply bg-seva-dark text-seva-light py-12;
+}
+
+.footer-title {
+  @apply text-xl font-semibold mb-4;
+}
+
+.footer-link {
+  @apply hover:text-seva-red transition-colors duration-300;
+}
+
+/* Home page styles */
+.hero-section {
+  @apply gradient-bg text-white p-12 rounded-lg shadow-md;
+}
+
+.feature-card {
+  @apply text-center;
+}
+
+.feature-icon {
+  @apply text-5xl text-seva-red dark:text-seva-blue mx-auto mb-4;
+}
+
+/* Services page styles */
+.service-card {
+  @apply card p-6 flex flex-col items-center text-center;
+}
+
+/* Hospitals page styles */
+.hospital-card {
+  @apply card p-6;
+}
+
+/* Blog page styles */
+.blog-post {
+  @apply card p-6;
+}
+
+.blog-meta {
+  @apply flex items-center text-seva-gray text-sm mb-4;
+}
+
+/* Gallery page styles */
+.gallery-item {
+    @apply relative overflow-hidden rounded-lg shadow-md;
+  }
+  
+  .gallery-overlay {
+    @apply absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300;
+  }
+  
+
+/* Form styles */
+.form-container {
+  @apply max-w-md mx-auto card;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .header-nav {
+    @apply flex-col items-start space-y-4;
+  }
+
+  .hero-section {
+    @apply p-6;
+  }
+
+  .section-title {
+    @apply text-2xl;
+  }
+}
+
+/* Dark mode styles */
+.dark .card {
+  @apply bg-seva-dark text-seva-light;
+}
+
+.dark .input {
+  @apply bg-seva-dark border-seva-gray text-seva-light;
+}
+
+.dark .btn-primary {
+  @apply bg-seva-blue hover:bg-seva-red;
+}
+
+.dark .btn-secondary {
+  @apply bg-seva-red hover:bg-seva-blue;
+}
