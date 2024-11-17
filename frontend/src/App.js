@@ -20,7 +20,7 @@ import './styles/global.css';
 import i18n from './i18n';
 
 const App = () => {
-  const { darkMode, toggleDarkMode } = useTheme();
+  const { darkMode } = useTheme();
   const [isOpen, setIsOpen] = useState(true);
 
   const menuItems = [
@@ -43,7 +43,6 @@ const App = () => {
     <Suspense fallback={<LoadingSpinner />}>
       <Router>
         <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-          {/* Sidebar */}
           <motion.div
             animate={{
               width: isOpen ? "16rem" : "4rem",
@@ -53,23 +52,23 @@ const App = () => {
               type: "spring",
               damping: 10,
             }}
-            className={`fixed left-0 top-0 h-screen bg-white dark:bg-gray-800 shadow-lg z-50 
-              ${darkMode ? 'dark:border-r dark:border-gray-700' : 'border-r border-gray-200'}`}
+            className={`fixed left-0 top-0 h-screen bg-white shadow-lg z-50 
+              ${darkMode ? 'dark:bg-gray-800 dark:border-r dark:border-gray-700' : 'border-r border-gray-200'}`}
           >
             <div className="flex flex-col h-full">
               {/* Logo and Toggle */}
               <div className="flex items-center justify-between p-4">
-              <div className="flex flex-col items-center">
-  <img
-    src="/images/seva-logo.webp"
-    alt="SevaDrive Logo"
-    className="w-19 h-19 rounded-full"
-  />
-  {isOpen && (
-    <span className="mt-2 font-bold text-xl dark:text-white">
-    </span>
-  )}
-</div>
+                <div className="flex flex-col items-center">
+                  <img
+                    src="/images/seva-logo.webp"
+                    alt="SevaDrive Logo"
+                    className="w-19 h-19 rounded-full"
+                  />
+                  {isOpen && (
+                    <span className="mt-2 font-bold text-xl dark:text-white">
+                    </span>
+                  )}
+                </div>
 
                 <button
                   onClick={() => setIsOpen(!isOpen)}
@@ -98,7 +97,7 @@ const App = () => {
                 ))}
               </nav>
 
-              {/* Language and Theme Toggles */}
+              {/* Language Toggle */}
               <div className={`p-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                 <div className={`flex ${isOpen ? 'justify-between' : 'justify-center'} mb-2`}>
                   {isOpen && (
@@ -120,14 +119,6 @@ const App = () => {
                     </>
                   )}
                 </div>
-                <button
-                  onClick={toggleDarkMode}
-                  className={`w-full p-2 rounded-lg hover:bg-gray-100 
-                    dark:hover:bg-gray-700 transition-colors text-sm
-                    ${!isOpen && 'p-2'}`}
-                >
-                  {isOpen ? (darkMode ? 'Light Mode' : 'Dark Mode') : '🌓'}
-                </button>
               </div>
             </div>
           </motion.div>

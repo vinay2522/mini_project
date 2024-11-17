@@ -1,34 +1,32 @@
-import React, { startTransition } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { FaCalendar, FaUser } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import Section from './Section';
+import { useTheme } from '../context/ThemeContext';
 
 const BlogPost = ({ title, date, author, excerpt }) => {
   const { t } = useTranslation();
+  const { darkMode } = useTheme();
 
   return (
     <motion.div
+      className={`p-6 bg-${darkMode ? 'gray-800 text-white' : 'white text-black'} rounded-md shadow-md`}
       whileHover={{ scale: 1.05 }}
-      className="card p-6"
     >
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <div className="flex items-center text-seva-gray text-sm mb-4">
-        <FaCalendar className="mr-2" />
-        <span className="mr-4">{date}</span>
-        <FaUser className="mr-2" />
-        <span>{author}</span>
+      <h2 className="text-2xl font-bold mb-2">{title}</h2>
+      <div className="text-sm text-gray-600 flex items-center gap-4 mb-4">
+        <FaCalendar /> {date} <FaUser /> {author}
       </div>
       <p className="mb-4">{excerpt}</p>
-      <button className="text-seva-red dark:text-seva-blue hover:underline">
-        {t('blog.readMore')}
-      </button>
+      <a className="text-blue-500 underline">{t('blog.readMore')}</a>
     </motion.div>
   );
 };
 
 const Blog = () => {
   const { t } = useTranslation();
+  const { darkMode } = useTheme();
 
   const blogPosts = [
     {
@@ -52,13 +50,11 @@ const Blog = () => {
   ];
 
   return (
-    <Section id="blog" title={t('blog')}>
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogPosts.map((post, index) => (
-            <BlogPost key={index} {...post} />
-          ))}
-        </div>
+    <Section title={t('blog.title')} id="blog">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {blogPosts.map((post, index) => (
+          <BlogPost key={index} {...post} />
+        ))}
       </div>
     </Section>
   );
