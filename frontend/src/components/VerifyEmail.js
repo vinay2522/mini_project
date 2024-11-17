@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { verifyEmail } from './service/api';
+import { verifyEmail } from './api/index';
 import { useParams } from 'react-router-dom';
 
 const VerifyEmail = () => {

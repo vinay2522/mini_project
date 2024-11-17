@@ -28,7 +28,9 @@ const Section = ({ id, title, children, bgColor = 'bg-white' }) => {
       >
         {children}
       </motion.div>
+      
     </motion.section>
+    
   );
 };
 

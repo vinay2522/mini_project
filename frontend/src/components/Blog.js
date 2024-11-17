@@ -32,19 +32,19 @@ const Blog = () => {
 
   const blogPosts = [
     {
-      title: t('blog.post1.title'),
+      title: t('blog.post1'),
       date: "2023-05-15",
       author: "Dr. John Doe",
       excerpt: t('blog.post1.excerpt'),
     },
     {
-      title: t('blog.post2.title'),
+      title: t('blog.post2'),
       date: "2023-04-28",
       author: "Jane Smith",
       excerpt: t('blog.post2.excerpt'),
     },
     {
-      title: t('blog.post3.title'),
+      title: t('blog.post3'),
       date: "2023-04-10",
       author: "Mike Johnson",
       excerpt: t('blog.post3.excerpt'),
@@ -52,7 +52,7 @@ const Blog = () => {
   ];
 
   return (
-    <Section id="blog" title={t('blog.title')}>
+    <Section id="blog" title={t('blog')}>
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {blogPosts.map((post, index) => (

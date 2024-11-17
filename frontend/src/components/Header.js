@@ -28,8 +28,8 @@ const Header = () => {
     <header className="bg-white dark:bg-seva-dark shadow-md">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link to="/" className="flex items-center hover-scale">
-          <img src="/logo.png" alt="SevaDrive Logo" className="h-12 w-12 mr-2" />
-          <h1 className="text-2xl font-display font-bold text-seva-red dark:text-seva-blue">SevaDrive</h1>
+          {/* <img src="/images/seva-logo.webp" alt="SevaDrive Logo" className="h-12 w-12 mr-2" /> */}
+          <h1 className="text-4xl font-display font-bold text-seva-red dark:text-seva-blue">SevaDrive</h1>
         </Link>
         <nav className="flex items-center space-x-6">
           <a href="https://wa.me/9632598430" target="_blank" rel="noopener noreferrer" className="flex items-center text-seva-dark dark:text-seva-light hover:text-seva-red dark:hover:text-seva-blue transition-colors duration-300">

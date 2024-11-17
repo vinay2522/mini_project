@@ -59,18 +59,18 @@ const App = () => {
             <div className="flex flex-col h-full">
               {/* Logo and Toggle */}
               <div className="flex items-center justify-between p-4">
-                <div className="flex items-center">
-                  <img
-                    src="/logo.png"
-                    alt="SevaDrive Logo"
-                    className="w-10 h-10 rounded-full"
-                  />
-                  {isOpen && (
-                    <span className="ml-2 font-bold text-xl dark:text-white">
-                      SevaDrive
-                    </span>
-                  )}
-                </div>
+              <div className="flex flex-col items-center">
+  <img
+    src="/images/seva-logo.webp"
+    alt="SevaDrive Logo"
+    className="w-19 h-19 rounded-full"
+  />
+  {isOpen && (
+    <span className="mt-2 font-bold text-xl dark:text-white">
+    </span>
+  )}
+</div>
+
                 <button
                   onClick={() => setIsOpen(!isOpen)}
                   className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 
@@ -111,11 +111,11 @@ const App = () => {
                         EN
                       </button>
                       <button
-                        onClick={() => changeLanguage('fr')}
+                        onClick={() => changeLanguage('kn')}
                         className="px-2 py-1 text-sm rounded hover:bg-gray-100 
                           dark:hover:bg-gray-700 transition-colors"
                       >
-                        FR
+                        KN
                       </button>
                     </>
                   )}

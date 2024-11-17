@@ -36,40 +36,76 @@ const Home = () => {
         </section>
 
         {/* About Us Section */}
-        <Element name="about">
-          <Section id="about" title="About Us" className="mb-8"> {/* Added mb-8 for bottom margin */}
-            <p className="text-lg">
-              SevaDrive is committed to providing high-quality ambulance services in Tumakuru. Our team of trained
-              professionals ensures that patients receive the best care during transportation.
-            </p>
-            <div className="mt-6 flex justify-around">
-              <div className="text-center">
-                <FaAmbulance className="text-4xl text-red-600 mx-auto mb-2" />
-                <p>Modern Ambulances</p>
-              </div>
-              <div className="text-center">
-                <FaUserMd className="text-4xl text-red-600 mx-auto mb-2" />
-                <p>Expert Medical Staff</p>
-              </div>
-              <div className="text-center">
-                <FaPhoneAlt className="text-4xl text-red-600 mx-auto mb-2" />
-                <p>24/7 Support</p>
-              </div>
-            </div>
-            <MissionSection />
-          </Section>
-        </Element>
+<Element name="about">
+  <Section id="about" title="About Us" className="mb-8 bg-gray-50 rounded-lg shadow-lg p-8">
+    <div className="text-center">
+      <h2 className="text-3xl font-bold text-blue-600 mb-4">About Us</h2>
+      <p className="text-lg text-gray-700 mb-6">
+        Welcome to <strong className="text-red-500">SevaDrive</strong>, your trusted partner in emergency medical services. 
+        We are a dedicated team of healthcare professionals and drivers united by a mission to save lives and provide 
+        compassionate care during medical emergencies.
+      </p>
+    </div>
 
-        {/* Who We Are Section */}
-        <Element name="who-we-are">
-          <Section id="who-we-are" title="Who We Are" className="mb-8"> {/* Added mb-8 for bottom margin */}
-            <p className="text-lg">
-              We are a dedicated team of healthcare professionals and drivers working together to provide timely and
-              efficient ambulance services. Our mission is to save lives and ensure patient comfort during medical
-              emergencies.
-            </p>
-          </Section>
-        </Element>
+    <div className="flex flex-wrap justify-center gap-6">
+      {/* About Mission */}
+      <div className="max-w-sm p-4 bg-white rounded-md shadow-md border-t-4 border-blue-500">
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">Our Mission</h3>
+        <p className="text-gray-600">
+          To deliver prompt, professional, and compassionate ambulance services, ensuring every patient receives the care they deserve, 
+          every step of the way.
+        </p>
+      </div>
+
+      {/* About Services */}
+      <div className="max-w-sm p-4 bg-white rounded-md shadow-md border-t-4 border-green-500">
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">What We Offer</h3>
+        <ul className="list-disc list-inside text-gray-600">
+          <li>Basic Life Support (BLS) Ambulances</li>
+          <li>Advanced Cardiac Life Support (ACLS) Ambulances</li>
+          <li>Neonatal & Pediatric Transfers</li>
+          <li>Pet Ambulance Services</li>
+          <li>Long-distance and Inter-city Transfers</li>
+        </ul>
+      </div>
+
+      {/* About Features */}
+      <div className="max-w-sm p-4 bg-white rounded-md shadow-md border-t-4 border-orange-500">
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">Why Choose Us?</h3>
+        <div className="mt-4 flex items-center gap-4">
+          <FaAmbulance className="text-4xl text-red-600" />
+          <p className="text-gray-600">Modern and well-equipped ambulances for any emergency.</p>
+        </div>
+        <div className="mt-4 flex items-center gap-4">
+          <FaUserMd className="text-4xl text-red-600" />
+          <p className="text-gray-600">Expert medical staff ensuring quality care.</p>
+        </div>
+        <div className="mt-4 flex items-center gap-4">
+          <FaPhoneAlt className="text-4xl text-red-600" />
+          <p className="text-gray-600">24/7 helpline for round-the-clock assistance.</p>
+        </div>
+      </div>
+    </div>
+
+    <div className="mt-8 text-center">
+      <h3 className="text-2xl font-bold text-blue-600 mb-4">Who We Are</h3>
+      <p className="text-lg text-gray-700 mb-6">
+        At SevaDrive, we strive to redefine emergency medical transportation by ensuring every journey is safe, efficient, and comfortable. 
+        Our team is driven by innovation and compassion to bridge the gap between medical emergencies and timely care.
+      </p>
+      <img
+        src="/images/ambulance.webp"
+        alt="Dedicated Ambulance Team"
+        className="mt-4 mx-auto w-full max-w-md rounded-lg shadow-md"
+      />
+      <p className="text-lg font-medium text-gray-800 mt-6">
+        Join us in creating a safer, healthier tomorrow. Let SevaDrive be your trusted partner in times of need.
+      </p>
+    </div>
+  </Section>
+</Element>
+
+
 
         {/* Contact Section */}
         <Element name="contact">

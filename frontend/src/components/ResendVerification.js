@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { resendVerification } from './service/api';
+import { resendVerification } from './api/index';
 
 const ResendVerification = () => {
     const [email, setEmail] = useState('');

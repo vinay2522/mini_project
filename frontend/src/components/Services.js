@@ -20,29 +20,29 @@ const Services = () => {
   const services = [
     {
       icon: FaAmbulance,
-      title: t('services.emergency.title'),
-      description: t('services.emergency.description'),
+      title: t('emergency'),
+      description: t('emergency.description'),
     },
     {
       icon: FaHeartbeat,
-      title: t('services.criticalCare.title'),
-      description: t('services.criticalCare.description'),
+      title: t('criticalCare'),
+      description: t('criticalCare.description'),
     },
     {
       icon: FaWheelchair,
-      title: t('services.nonEmergency.title'),
-      description: t('services.nonEmergency.description'),
+      title: t('nonEmergency'),
+      description: t('nonEmergency.description'),
     },
     {
       icon: FaHospital,
-      title: t('services.transfer.title'),
-      description: t('services.transfer.description'),
+      title: t('transfer'),
+      description: t('transfer.description'),
     },
   ];
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <h2 className="section-title text-center mb-12">{t('services.title')}</h2>
+      <h2 className="section-title text-center mb-12">{t('services')}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {services.map((service, index) => (
           <ServiceCard key={index} {...service} />
