@@ -69,10 +69,10 @@ const BookingForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="bg-gray-800 text-white rounded-lg p-6 max-w-md w-full">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="bg-white text-gray-800 rounded-lg p-6 max-w-md w-full shadow-md">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-white">
+          <h2 className="text-2xl font-bold">
             {step === 1 && 'Select Emergency Type'}
             {step === 2 && 'Location Access'}
             {step === 3 && 'Booking Confirmation'}
@@ -85,7 +85,7 @@ const BookingForm = () => {
               <button
                 key={type.id}
                 onClick={() => handleEmergencyTypeSelect(type.id)}
-                className="flex items-center gap-3 w-full p-4 text-left rounded-lg border border-gray-700 hover:bg-gray-700 transition-colors"
+                className="flex items-center gap-3 w-full p-4 text-left rounded-lg border border-gray-300 hover:bg-gray-200 transition-colors"
               >
                 <span className="text-2xl">{type.icon}</span>
                 <span className="font-medium">{type.label}</span>
@@ -96,7 +96,7 @@ const BookingForm = () => {
 
         {step === 2 && (
           <div>
-            <p className="mb-6 text-gray-300">
+            <p className="mb-6 text-gray-600">
               We need your location to send the nearest available ambulance to you.
               Please enable location access when prompted.
             </p>
@@ -108,7 +108,7 @@ const BookingForm = () => {
               {loading ? 'Processing...' : 'Share Location & Book Now'}
             </button>
             {error && (
-              <div className="mt-4 p-3 bg-red-800 text-red-300 rounded-md">
+              <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
                 {error}
               </div>
             )}
@@ -118,8 +118,8 @@ const BookingForm = () => {
         {step === 3 && success && (
           <div className="text-center">
             <div className="text-green-500 text-5xl mb-4">✓</div>
-            <h3 className="text-xl font-bold text-green-300 mb-2">Booking Successful!</h3>
-            <p className="text-gray-300">
+            <h3 className="text-xl font-bold text-green-600 mb-2">Booking Successful!</h3>
+            <p className="text-gray-600">
               An ambulance has been dispatched to your location.
               Please stay where you are.
             </p>

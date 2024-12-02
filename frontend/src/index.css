@@ -17,3 +17,13 @@ body {
 .card {
   @apply bg-white shadow-md rounded-lg p-6;
 }
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.dark body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}

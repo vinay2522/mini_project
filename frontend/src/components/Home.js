@@ -19,18 +19,35 @@ const Home = () => {
         {/* Hero Section */}
         <section className="hero gradient-bg text-white p-8 rounded-lg mb-8">
           <h2 className="text-4xl font-bold mb-4 text-shadow">
-            DRIVING CARE IN HEALTHCARE across Tumakuru
+            Your Emergency,Our Priority
           </h2>
           <p className="text-2xl mb-4 pulse-animation">GIVE WAY TO AMBULANCE</p>
           <p className="mb-4 text-lg">
             24/7 emergency & medical transportation support. Ensuring professional medical care throughout the journey.
           </p>
-          <button
-            onClick={handleBookNow}
-            className="bg-white text-red-600 px-6 py-2 rounded hover:bg-red-100 cursor-pointer hover-scale inline-block"
-          >
-            Book Now
-          </button>
+        </section>
+
+        {/* Book Now Section */}
+        <section className="book-now-section bg-white p-8 rounded-lg shadow-lg mb-8 flex flex-col md:flex-row items-center justify-between">
+          <div className="md:w-1/2">
+            <h3 className="text-3xl font-bold mb-4 text-red-600">Emergency Booking</h3>
+            <p className="text-lg mb-4 text-gray-700">
+              Need an ambulance urgently? Book now and get immediate assistance.
+            </p>
+            <button
+              onClick={handleBookNow}
+              className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 cursor-pointer hover-scale inline-block"
+            >
+              Book Now
+            </button>
+          </div>
+          <div className="md:w-1/2 mt-8 md:mt-0 flex justify-center">
+            <img
+              src="/images/ambulance.gif"
+              alt="Ambulance"
+              className="w-full max-w-md rounded-lg shadow-md"
+            />
+          </div>
         </section>
 
         {/* About Us Section */}

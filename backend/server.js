@@ -14,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.set('trust proxy', 1);
+
 // Rate limiting
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -35,7 +36,7 @@ mongoose.connect(process.env.MONGODB_URI, {
     useUnifiedTopology: true
 })
 .then(() => console.log('MongoDB connected'))
-.catch((err) => console.log(err));
+.catch((err) => console.log('MongoDB connection error:', err));
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -49,16 +50,6 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', userSchema);
-
-// Contact Schema
-const contactSchema = new mongoose.Schema({
-    name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, lowercase: true, trim: true },
-    message: { type: String, required: true, trim: true },
-    createdAt: { type: Date, default: Date.now }
-});
-
-const Contact = mongoose.model('Contact', contactSchema);
 
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
@@ -141,6 +132,7 @@ app.post('/api/register', async (req, res) => {
         }
 
     } catch (error) {
+        console.error('Registration error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
@@ -160,7 +152,8 @@ app.get('/api/verify/:token', async (req, res) => {
         user.verificationToken = undefined;
         await user.save();
 
-        res.json({ message: 'Email verified successfully' });
+        // Redirect to login page after successful verification
+        res.redirect(`${process.env.FRONTEND_URL}/login`);
     } catch (error) {
         res.status(500).json({ message: 'Invalid token or server error' });
     }

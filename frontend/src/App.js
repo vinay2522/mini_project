@@ -1,7 +1,6 @@
 import React, { Suspense, useState, startTransition } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useTheme } from './context/ThemeContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './components/Home';
@@ -17,10 +16,8 @@ import ForgotPassword from './components/ForgotPassword';
 import LoadingSpinner from './components/LoadingSpinner';
 import BookingForm from './components/BookingForm';
 import './styles/global.css';
-import i18n from './i18n';
 
 const App = () => {
-  const { darkMode } = useTheme();
   const [isOpen, setIsOpen] = useState(true);
 
   const menuItems = [
@@ -33,16 +30,10 @@ const App = () => {
     { title: 'Help Desk', path: '/helpdesk' },
   ];
 
-  const changeLanguage = (lng) => {
-    startTransition(() => {
-      i18n.changeLanguage(lng);
-    });
-  };
-
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Router>
-        <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
+        <div className="min-h-screen">
           <motion.div
             animate={{
               width: isOpen ? "16rem" : "4rem",
@@ -52,8 +43,7 @@ const App = () => {
               type: "spring",
               damping: 10,
             }}
-            className={`fixed left-0 top-0 h-screen bg-white shadow-lg z-50 
-              ${darkMode ? 'dark:bg-gray-800 dark:border-r dark:border-gray-700' : 'border-r border-gray-200'}`}
+            className="fixed left-0 top-0 h-screen bg-white shadow-lg z-50 border-r border-gray-200"
           >
             <div className="flex flex-col h-full">
               {/* Logo and Toggle */}
@@ -65,15 +55,15 @@ const App = () => {
                     className="w-19 h-19 rounded-full"
                   />
                   {isOpen && (
-                    <span className="mt-2 font-bold text-xl dark:text-white">
+                    <span className="mt-2 font-bold text-xl">
+                      
                     </span>
                   )}
                 </div>
 
                 <button
                   onClick={() => setIsOpen(!isOpen)}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 
-                    transition-colors duration-200"
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                 >
                   {isOpen ? '←' : '→'}
                 </button>
@@ -86,8 +76,8 @@ const App = () => {
                     key={index}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 
-                      hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200
+                    className={`flex items-center px-4 py-3 text-gray-700 
+                      hover:bg-gray-100 transition-colors duration-200
                       ${!isOpen && 'justify-center'}`}
                   >
                     <Link to={item.path} className={`${!isOpen && 'hidden'} ml-2`}>
@@ -96,30 +86,6 @@ const App = () => {
                   </motion.div>
                 ))}
               </nav>
-
-              {/* Language Toggle */}
-              <div className={`p-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                <div className={`flex ${isOpen ? 'justify-between' : 'justify-center'} mb-2`}>
-                  {isOpen && (
-                    <>
-                      <button
-                        onClick={() => changeLanguage('en')}
-                        className="px-2 py-1 text-sm rounded hover:bg-gray-100 
-                          dark:hover:bg-gray-700 transition-colors"
-                      >
-                        EN
-                      </button>
-                      <button
-                        onClick={() => changeLanguage('kn')}
-                        className="px-2 py-1 text-sm rounded hover:bg-gray-100 
-                          dark:hover:bg-gray-700 transition-colors"
-                      >
-                        KN
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
             </div>
           </motion.div>
 
