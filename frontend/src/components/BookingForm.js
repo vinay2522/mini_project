@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import './BookingForm.css';
-import axios from 'axios';
 
 const BookingForm = () => {
   const [step, setStep] = useState(1);
@@ -38,32 +36,66 @@ const BookingForm = () => {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        // Log the coordinates for debugging
+        console.log('Obtained Location:', { latitude, longitude });
+
         setBookingData(prev => ({
           ...prev,
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+          latitude,
+          longitude,
         }));
-        handleBooking();
+        
+        // Immediately call handleBooking with updated coordinates
+        handleBooking(latitude, longitude);
       },
       (error) => {
+        console.error('Geolocation Error:', error);
         setError('Unable to retrieve your location. Please enable location access.');
         setLoading(false);
       }
     );
   };
 
-  const handleBooking = async () => {
+  const handleBooking = async (lat, lon) => {
     try {
-      const response = await axios.post('/api/bookings', bookingData);
+      // Ensure we have both latitude and longitude
+      if (lat === null || lon === null) {
+        throw new Error('Location coordinates are missing');
+      }
+
+      // Use the latest coordinates from the function parameters
+      const bookingPayload = {
+        ...bookingData,
+        latitude: lat,
+        longitude: lon
+      };
+
+      console.log('Booking Payload:', bookingPayload);
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bookingPayload)
+      });
+
       if (response.status === 201) {
         setSuccess(true);
         setLoading(false);
         setStep(3);
       } else {
-        throw new Error('Booking failed');
+        // Try to parse error message from response
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Booking failed');
       }
     } catch (err) {
-      setError('Failed to book ambulance. Please try again.');
+      console.error('Booking Error:', err);
+      
+      // More detailed error handling
+      setError(err.message || 'Network error. Please check your connection.');
       setLoading(false);
     }
   };

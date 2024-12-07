@@ -58,6 +58,9 @@ const Login = () => {
           </button>
         </form>
         <p className="mt-4 text-center">
+          <Link to="/forgot-password" className="text-seva-red dark:text-seva-blue hover:underline">Forgot Password?</Link>
+        </p>
+        <p className="mt-4 text-center">
           Don't have an account? <Link to="/register" className="text-seva-red dark:text-seva-blue hover:underline">Register</Link>
         </p>
       </motion.div>

@@ -1,11 +1,11 @@
-/* BookingForm.css */
+/* General Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* Lighter overlay */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -13,25 +13,39 @@
 }
 
 .modal-content {
-  background: #ffffff; /* Light background for modal */
+  background: #ffffff;
   padding: 2rem;
   border-radius: 0.5rem;
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
-  color: #333333; /* Dark text color */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  color: #333333;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Input and Button Styles */
 .input-field {
   width: 100%;
   padding: 0.75rem;
   margin: 0.5rem 0;
-  border: 1px solid #cccccc; /* Light border color */
-  background-color: #f8f9fa; /* Light input background */
-  color: #333333; /* Dark text color */
+  border: 1px solid #cccccc;
+  background-color: #f8f9fa;
+  color: #333333;
   border-radius: 0.375rem;
+  font-size: 1rem;
 }
 
 .emergency-type-button {
@@ -39,9 +53,9 @@
   padding: 1rem;
   margin: 0.5rem 0;
   text-align: left;
-  border: 1px solid #cccccc; /* Light border for buttons */
-  background-color: #ffffff; /* Light background for buttons */
-  color: #333333; /* Dark text color */
+  border: 1px solid #cccccc;
+  background-color: #ffffff;
+  color: #333333;
   border-radius: 0.375rem;
   display: flex;
   align-items: center;
@@ -50,9 +64,10 @@
 }
 
 .emergency-type-button:hover {
-  background-color: #f1f1f1; /* Hover effect */
+  background-color: #f1f1f1;
 }
 
+/* Error and Success Messages */
 .error-message {
   color: #e53e3e;
   margin-top: 0.5rem;
@@ -64,7 +79,7 @@
   margin-top: 1rem;
 }
 
-/* Add some styles for the loading spinner */
+/* Loading Spinner */
 .loader {
   display: flex;
   justify-content: center;
@@ -82,6 +97,45 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 1.5rem;
+    width: 95%;
+  }
+
+  .emergency-type-button {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    gap: 0.5rem;
+  }
+
+  .input-field {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 1rem;
+  }
+
+  .emergency-type-button {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .input-field {
+    padding: 0.4rem;
+    font-size: 0.8rem;
+  }
 }

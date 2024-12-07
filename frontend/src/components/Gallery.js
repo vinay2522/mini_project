@@ -9,7 +9,7 @@ const GalleryItem = ({ src, alt, onClick }) => (
     className="relative group overflow-hidden rounded-lg shadow-md cursor-pointer"
     onClick={onClick}
   >
-    <img src={src} alt={alt} className="w-full h-64 object-cover" />
+    <img src={src} alt={alt} className="w-full h-48 sm:h-64 object-cover" />
     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
       <p className="text-white text-lg font-semibold">{alt}</p>
     </div>
@@ -37,12 +37,12 @@ const Gallery = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const images = [
-    { src: "/images/img1.jpg", alt: t('') },
-    { src: "/images/img2.jpg", alt: t('') },
-    { src: "/images/img3.jpeg", alt: t('') },
-    { src: "/images/img4.jpg", alt: t('') },
-    { src: "/images/img5.jpg", alt: t('') },
-    { src: "/images/img6.jpg", alt: t('') },
+    { src: "/images/img1.jpg", alt: t('Gallery Image 1') },
+    { src: "/images/img2.jpg", alt: t('Gallery Image 2') },
+    { src: "/images/img3.jpeg", alt: t('Gallery Image 3') },
+    { src: "/images/img4.jpg", alt: t('Gallery Image 4') },
+    { src: "/images/img5.jpg", alt: t('Gallery Image 5') },
+    { src: "/images/img6.jpg", alt: t('Gallery Image 6') },
   ];
 
   const openModal = (index) => {
@@ -69,7 +69,7 @@ const Gallery = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <h2 className="section-title text-center mb-12">{t('Gallery')}</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {images.map((image, index) => (
           <GalleryItem key={index} {...image} onClick={() => openModal(index)} />
         ))}

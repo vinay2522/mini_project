@@ -4,23 +4,38 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const Register = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { name, email, password, confirmPassword } = formData;
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
     try {
-      const response = await axios.post('http://localhost:5000/api/register', { name, email, password });
-      // Handle successful registration (e.g., redirect to login page)
-    } catch (error) {
-      setError(error.response.data.message);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/register`, {
+        name,
+        email,
+        password,
+      });
+      setSuccess(true);
+      setError(null);
+    } catch (err) {
+      setError(err.response?.data?.message || 'An error occurred.');
     }
   };
 
@@ -34,14 +49,19 @@ const Register = () => {
       >
         <h2 className="section-title text-center mb-8">Register</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
+        {success && (
+          <p className="text-green-500 mb-4">
+            Registration successful! Please check your email for verification.
+          </p>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="name" className="block mb-1 font-semibold">Name</label>
             <input
               type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
               className="input"
               required
             />
@@ -50,9 +70,9 @@ const Register = () => {
             <label htmlFor="email" className="block mb-1 font-semibold">Email</label>
             <input
               type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               className="input"
               required
             />
@@ -61,9 +81,9 @@ const Register = () => {
             <label htmlFor="password" className="block mb-1 font-semibold">Password</label>
             <input
               type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               className="input"
               required
             />
@@ -72,9 +92,9 @@ const Register = () => {
             <label htmlFor="confirmPassword" className="block mb-1 font-semibold">Confirm Password</label>
             <input
               type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
               className="input"
               required
             />
@@ -84,7 +104,7 @@ const Register = () => {
           </button>
         </form>
         <p className="mt-4 text-center">
-          Already have an account? <Link to="/login" className="text-seva-red dark:text-seva-blue hover:underline">Login</Link>
+          Already have an account? <Link to="/login" className="text-seva-red hover:underline">Login</Link>
         </p>
       </motion.div>
     </div>

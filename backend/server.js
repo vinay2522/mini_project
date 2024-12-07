@@ -17,20 +17,20 @@ app.set('trust proxy', 1);
 
 // Rate limiting
 const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // limit each IP to 5 requests per windowMs
+    windowMs: 15 * 60 * 1000,
+    max: 5,
     message: 'Too many login attempts from this IP, please try again after 15 minutes'
 });
 app.use('/api/login', loginLimiter);
 
 const resetLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 2, // limit each IP to 2 requests per windowMs
+    windowMs: 60 * 60 * 1000,
+    max: 2,
     message: 'Too many password reset requests from this IP, please try again after 1 hour'
 });
 app.use('/api/reset-password-request', resetLimiter);
 
-// MongoDB Connection
+// MongoDB Connection with error handling
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -38,15 +38,54 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => console.log('MongoDB connected'))
 .catch((err) => console.log('MongoDB connection error:', err));
 
-// User Schema
+// Contact Schema
+const contactSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    message: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const Contact = mongoose.model('Contact', contactSchema);
+
+// User Schema - Updated to handle the username/name issue
 const userSchema = new mongoose.Schema({
-    name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, required: true, minlength: 8 },
+    name: { 
+        type: String, 
+        required: true,
+        trim: true 
+    },
+    email: { 
+        type: String, 
+        required: true, 
+        unique: true, 
+        lowercase: true, 
+        trim: true,
+        validate: {
+            validator: validator.isEmail,
+            message: 'Invalid email format'
+        }
+    },
+    password: { 
+        type: String, 
+        required: true, 
+        minlength: [8, 'Password must be at least 8 characters long']
+    },
     verificationToken: String,
     isVerified: { type: Boolean, default: false },
     resetPasswordToken: String,
-    resetPasswordExpires: Date
+    resetPasswordExpires: Date,
+    createdAt: { type: Date, default: Date.now }
+});
+
+// Remove any existing indexes to prevent conflicts
+mongoose.connection.once('open', async () => {
+    try {
+        await mongoose.connection.collection('users').dropIndexes();
+        console.log('Indexes were dropped successfully');
+    } catch (err) {
+        console.log('Error dropping indexes:', err);
+    }
 });
 
 const User = mongoose.model('User', userSchema);
@@ -60,7 +99,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Helper function to send emails
+// Helper function to send emails with error handling
 const sendEmail = async (to, subject, html) => {
     try {
         await transporter.sendMail({
@@ -76,28 +115,40 @@ const sendEmail = async (to, subject, html) => {
     }
 };
 
-// Registration endpoint
+// Registration endpoint - Updated with better error handling
 app.post('/api/register', async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
         // Validate user input
         if (!name || !email || !password) {
-            return res.status(400).json({ message: 'All fields are required' });
+            return res.status(400).json({ 
+                success: false,
+                message: 'All fields are required' 
+            });
         }
 
         if (!validator.isEmail(email)) {
-            return res.status(400).json({ message: 'Invalid email address' });
+            return res.status(400).json({ 
+                success: false,
+                message: 'Invalid email address' 
+            });
         }
 
         if (password.length < 8) {
-            return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+            return res.status(400).json({ 
+                success: false,
+                message: 'Password must be at least 8 characters long' 
+            });
         }
 
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: 'User already exists' });
+            return res.status(400).json({ 
+                success: false,
+                message: 'User with this email already exists' 
+            });
         }
 
         // Hash password
@@ -126,14 +177,33 @@ app.post('/api/register', async (req, res) => {
         );
 
         if (emailSent) {
-            res.status(201).json({ message: 'Registration successful. Please check your email to verify your account.' });
+            res.status(201).json({ 
+                success: true,
+                message: 'Registration successful. Please check your email to verify your account.' 
+            });
         } else {
-            res.status(500).json({ message: 'Registration successful but verification email could not be sent.' });
+            res.status(200).json({ 
+                success: true,
+                message: 'Registration successful but verification email could not be sent. Please contact support.' 
+            });
         }
 
     } catch (error) {
         console.error('Registration error:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        
+        // Handle specific MongoDB errors
+        if (error.code === 11000) {
+            return res.status(400).json({
+                success: false,
+                message: 'An account with this email already exists'
+            });
+        }
+
+        res.status(500).json({ 
+            success: false,
+            message: 'Server error during registration',
+            error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+        });
     }
 });
 
