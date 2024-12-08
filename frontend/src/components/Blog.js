@@ -12,15 +12,15 @@ const BlogPost = ({ title, date, author, excerpt }) => {
       className="p-4 md:p-6 bg-white text-black rounded-md shadow-md flex flex-col hover:shadow-lg transition-shadow duration-300"
       whileHover={{ scale: 1.05 }}
     >
-      <h2 className="text-lg md:text-2xl font-bold mb-2 truncate">{title}</h2>
-      <div className="text-xs md:text-sm text-gray-600 flex items-center gap-2 md:gap-4 mb-4">
-        <FaCalendar className="text-gray-500" /> {date} 
-        <FaUser className="text-gray-500" /> {author}
+      <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-2 truncate">{title}</h2>
+      <div className="text-xs md:text-sm text-gray-600 flex flex-wrap items-center gap-2 md:gap-4 mb-4">
+        <span className="flex items-center"><FaCalendar className="text-gray-500 mr-1" /> {date}</span>
+        <span className="flex items-center"><FaUser className="text-gray-500 mr-1" /> {author}</span>
       </div>
       <p className="text-sm md:text-base mb-4 line-clamp-3">{excerpt}</p>
       <a
         href="#"
-        className="text-blue-500 hover:text-blue-700 underline transition-colors duration-200 self-start"
+        className="text-blue-500 hover:text-blue-700 underline transition-colors duration-200 self-start mt-auto"
       >
         {t('blog.readMore')}
       </a>
@@ -64,3 +64,4 @@ const Blog = () => {
 };
 
 export default Blog;
+

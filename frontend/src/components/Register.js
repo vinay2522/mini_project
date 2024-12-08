@@ -40,71 +40,71 @@ const Register = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-8 sm:py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-md mx-auto card"
+        className="max-w-md mx-auto bg-white shadow-md rounded-lg p-6 sm:p-8"
       >
-        <h2 className="section-title text-center mb-8">Register</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">Register</h2>
+        {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
         {success && (
-          <p className="text-green-500 mb-4">
+          <p className="text-green-500 mb-4 text-center">
             Registration successful! Please check your email for verification.
           </p>
         )}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div>
-            <label htmlFor="name" className="block mb-1 font-semibold">Name</label>
+            <label htmlFor="name" className="block mb-1 font-semibold text-sm sm:text-base">Name</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="input"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
           <div>
-            <label htmlFor="email" className="block mb-1 font-semibold">Email</label>
+            <label htmlFor="email" className="block mb-1 font-semibold text-sm sm:text-base">Email</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="input"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
           <div>
-            <label htmlFor="password" className="block mb-1 font-semibold">Password</label>
+            <label htmlFor="password" className="block mb-1 font-semibold text-sm sm:text-base">Password</label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="input"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
           <div>
-            <label htmlFor="confirmPassword" className="block mb-1 font-semibold">Confirm Password</label>
+            <label htmlFor="confirmPassword" className="block mb-1 font-semibold text-sm sm:text-base">Confirm Password</label>
             <input
               type="password"
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="input"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary w-full">
+          <button type="submit" className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 text-sm sm:text-base">
             Register
           </button>
         </form>
-        <p className="mt-4 text-center">
-          Already have an account? <Link to="/login" className="text-seva-red hover:underline">Login</Link>
+        <p className="mt-4 text-center text-sm sm:text-base">
+          Already have an account? <Link to="/login" className="text-red-600 hover:underline">Login</Link>
         </p>
       </motion.div>
     </div>
@@ -112,3 +112,4 @@ const Register = () => {
 };
 
 export default Register;
+

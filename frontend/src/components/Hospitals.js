@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { FaMapMarkerAlt, FaPhoneAlt } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhoneAlt, FaTimes } from 'react-icons/fa';
 
 const HospitalCard = ({ image, name, location, contact, onClick }) => (
   <motion.div
     whileHover={{ scale: 1.05 }}
-    className="card p-6 flex flex-col items-center text-center cursor-pointer"
+    className="bg-white p-4 sm:p-6 rounded-lg shadow-md flex flex-col items-center text-center cursor-pointer"
     onClick={onClick}
   >
-    <img src={image} alt={name} className="w-full h-48 object-cover mb-4 rounded-lg" />
-    <h3 className="text-xl font-semibold mb-2">{name}</h3>
-    <p className="mb-2">
+    <img src={image} alt={name} className="w-full h-40 sm:h-48 object-cover mb-4 rounded-lg" />
+    <h3 className="text-lg sm:text-xl font-semibold mb-2">{name}</h3>
+    <p className="mb-2 text-sm sm:text-base">
       <FaMapMarkerAlt className="inline-block mr-2" />
       <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`} target="_blank" rel="noopener noreferrer">
         {location}
       </a>
     </p>
-    <p>
+    <p className="text-sm sm:text-base">
       <FaPhoneAlt className="inline-block mr-2" />
       <a href={`tel:${contact}`}>{contact}</a>
     </p>
@@ -25,18 +25,20 @@ const HospitalCard = ({ image, name, location, contact, onClick }) => (
 );
 
 const HospitalDetails = ({ hospital, onClose }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-lg max-w-lg w-full">
-      <button onClick={onClose} className="text-red-500 mb-4">Close</button>
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="bg-white p-6 rounded-lg max-w-lg w-full max-h-90vh overflow-y-auto">
+      <button onClick={onClose} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+        <FaTimes size={24} />
+      </button>
       <img src={hospital.image} alt={hospital.name} className="w-full h-48 object-cover mb-4 rounded-lg" />
       <h3 className="text-xl font-semibold mb-2">{hospital.name}</h3>
-      <p className="mb-2">
+      <p className="mb-2 text-sm sm:text-base">
         <FaMapMarkerAlt className="inline-block mr-2" />
         <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hospital.location)}`} target="_blank" rel="noopener noreferrer">
           {hospital.location}
         </a>
       </p>
-      <p>
+      <p className="text-sm sm:text-base">
         <FaPhoneAlt className="inline-block mr-2" />
         <a href={`tel:${hospital.contact}`}>{hospital.contact}</a>
       </p>
@@ -44,7 +46,7 @@ const HospitalDetails = ({ hospital, onClose }) => (
   </div>
 );
 
-const Services = () => {
+const Hospitals = () => {
   const { t } = useTranslation();
   const [selectedHospital, setSelectedHospital] = useState(null);
 
@@ -94,10 +96,11 @@ const Services = () => {
     // Add more hospitals here
   ];
 
+
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h2 className="section-title text-center mb-12">{t('Hospitals')}</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div className="container mx-auto px-4 py-8 sm:py-12">
+      <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">{t('Hospitals')}</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
         {hospitals.map((hospital, index) => (
           <HospitalCard
             key={index}
@@ -116,4 +119,5 @@ const Services = () => {
   );
 };
 
-export default Services;
+export default Hospitals;
+

@@ -17,14 +17,14 @@ const GalleryItem = ({ src, alt, onClick }) => (
 );
 
 const Modal = ({ src, alt, onClose, onNext, onPrev }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
     <button onClick={onClose} className="absolute top-4 right-4 text-white text-2xl">
       <FaTimes />
     </button>
     <button onClick={onPrev} className="absolute left-4 text-white text-2xl">
       <FaArrowLeft />
     </button>
-    <img src={src} alt={alt} className="max-w-full max-h-full" />
+    <img src={src} alt={alt} className="max-w-full max-h-full object-contain" />
     <button onClick={onNext} className="absolute right-4 text-white text-2xl">
       <FaArrowRight />
     </button>
@@ -88,3 +88,4 @@ const Gallery = () => {
 };
 
 export default Gallery;
+

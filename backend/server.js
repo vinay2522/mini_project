@@ -17,20 +17,20 @@ app.set('trust proxy', 1);
 
 // Rate limiting
 const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 5,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // limit each IP to 5 requests per windowMs
     message: 'Too many login attempts from this IP, please try again after 15 minutes'
 });
 app.use('/api/login', loginLimiter);
 
 const resetLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: 2,
-    message: 'Too many password reset requests from this IP, please try again after 1 hour'
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // limit each IP to 5 requests per windowMs
+    message: 'Too many password reset requests from this IP, please try again after 15 minutes'
 });
 app.use('/api/reset-password-request', resetLimiter);
 
-// MongoDB Connection with error handling
+// MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -38,57 +38,30 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => console.log('MongoDB connected'))
 .catch((err) => console.log('MongoDB connection error:', err));
 
-// Contact Schema
-const contactSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true },
-    message: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now }
-});
-
-const Contact = mongoose.model('Contact', contactSchema);
-
-// User Schema - Updated to handle the username/name issue
+// User Schema
 const userSchema = new mongoose.Schema({
-    name: { 
-        type: String, 
-        required: true,
-        trim: true 
-    },
-    email: { 
-        type: String, 
-        required: true, 
-        unique: true, 
-        lowercase: true, 
-        trim: true,
-        validate: {
-            validator: validator.isEmail,
-            message: 'Invalid email format'
-        }
-    },
-    password: { 
-        type: String, 
-        required: true, 
-        minlength: [8, 'Password must be at least 8 characters long']
-    },
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    password: { type: String, required: true, minlength: 8 },
+    username: { type: String, unique: true, sparse: true }, // Add this line if username is optional
     verificationToken: String,
     isVerified: { type: Boolean, default: false },
     resetPasswordToken: String,
-    resetPasswordExpires: Date,
-    createdAt: { type: Date, default: Date.now }
-});
-
-// Remove any existing indexes to prevent conflicts
-mongoose.connection.once('open', async () => {
-    try {
-        await mongoose.connection.collection('users').dropIndexes();
-        console.log('Indexes were dropped successfully');
-    } catch (err) {
-        console.log('Error dropping indexes:', err);
-    }
+    resetPasswordExpires: Date
 });
 
 const User = mongoose.model('User', userSchema);
+
+// Booking Schema
+const bookingSchema = new mongoose.Schema({
+    emergencyType: { type: String, required: true },
+    latitude: { type: Number, required: true },
+    longitude: { type: Number, required: true },
+    email: { type: String, required: false },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const Booking = mongoose.model('Booking', bookingSchema);
 
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
@@ -99,7 +72,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Helper function to send emails with error handling
+// Helper function to send emails
 const sendEmail = async (to, subject, html) => {
     try {
         await transporter.sendMail({
@@ -115,40 +88,28 @@ const sendEmail = async (to, subject, html) => {
     }
 };
 
-// Registration endpoint - Updated with better error handling
+// Registration endpoint
 app.post('/api/register', async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, username } = req.body; // Include username
 
         // Validate user input
         if (!name || !email || !password) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'All fields are required' 
-            });
+            return res.status(400).json({ message: 'All fields are required' });
         }
 
         if (!validator.isEmail(email)) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'Invalid email address' 
-            });
+            return res.status(400).json({ message: 'Invalid email address' });
         }
 
         if (password.length < 8) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'Password must be at least 8 characters long' 
-            });
+            return res.status(400).json({ message: 'Password must be at least 8 characters long' });
         }
 
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'User with this email already exists' 
-            });
+            return res.status(400).json({ message: 'User already exists' });
         }
 
         // Hash password
@@ -163,6 +124,7 @@ app.post('/api/register', async (req, res) => {
             name,
             email,
             password: hashedPassword,
+            username, // Include username
             verificationToken
         });
 
@@ -177,33 +139,14 @@ app.post('/api/register', async (req, res) => {
         );
 
         if (emailSent) {
-            res.status(201).json({ 
-                success: true,
-                message: 'Registration successful. Please check your email to verify your account.' 
-            });
+            res.status(201).json({ message: 'Registration successful. Please check your email to verify your account.' });
         } else {
-            res.status(200).json({ 
-                success: true,
-                message: 'Registration successful but verification email could not be sent. Please contact support.' 
-            });
+            res.status(500).json({ message: 'Registration successful but verification email could not be sent.' });
         }
 
     } catch (error) {
         console.error('Registration error:', error);
-        
-        // Handle specific MongoDB errors
-        if (error.code === 11000) {
-            return res.status(400).json({
-                success: false,
-                message: 'An account with this email already exists'
-            });
-        }
-
-        res.status(500).json({ 
-            success: false,
-            message: 'Server error during registration',
-            error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
-        });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
 
@@ -226,6 +169,52 @@ app.get('/api/verify/:token', async (req, res) => {
         res.redirect(`${process.env.FRONTEND_URL}/login`);
     } catch (error) {
         res.status(500).json({ message: 'Invalid token or server error' });
+    }
+});
+
+// Booking endpoint
+app.post('/api/bookings', async (req, res) => {
+    try {
+        const { emergencyType, latitude, longitude, email } = req.body;
+
+        // Validate input
+        if (!emergencyType || latitude === null || longitude === null) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        // Create new booking
+        const booking = new Booking({
+            emergencyType,
+            latitude,
+            longitude,
+            email
+        });
+
+        await booking.save();
+
+        // Send confirmation email if email is provided
+        if (email) {
+            const emailSent = await sendEmail(
+                email,
+                'Booking Confirmation',
+                `
+                <h3>Booking Confirmation</h3>
+                <p>Your booking for an ambulance has been confirmed.</p>
+                <p>Emergency Type: ${emergencyType}</p>
+                <p>Location: (${latitude}, ${longitude})</p>
+                <p>An ambulance has been dispatched to your location. Please stay where you are.</p>
+                `
+            );
+
+            if (!emailSent) {
+                console.error('Failed to send booking confirmation email');
+            }
+        }
+
+        res.status(201).json({ message: 'Booking successful' });
+    } catch (error) {
+        console.error('Booking error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
 

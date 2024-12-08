@@ -15,7 +15,6 @@ const ForgotPassword = () => {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/reset-password-request`, { email });
       setMessage(response.data.message);
       setError(null);
-      // Navigate to reset password page with email as state
       navigate('/reset-password', { 
         state: { 
           email,
@@ -97,3 +96,4 @@ const ForgotPassword = () => {
 };
 
 export default ForgotPassword;
+
