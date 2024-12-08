@@ -58,10 +58,23 @@ const bookingSchema = new mongoose.Schema({
     latitude: { type: Number, required: true },
     longitude: { type: Number, required: true },
     email: { type: String, required: false },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    ambulanceDriverId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    ambulanceLatitude: { type: Number },
+    ambulanceLongitude: { type: Number }
 });
 
 const Booking = mongoose.model('Booking', bookingSchema);
+
+// Ambulance Schema (Add this)
+const ambulanceSchema = new mongoose.Schema({
+    status: { type: String, required: true, default: 'available' },
+    latitude: { type: Number, required: true },
+    longitude: { type: Number, required: true }
+});
+
+const Ambulance = mongoose.model('Ambulance', ambulanceSchema);
+
 
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
@@ -211,13 +224,136 @@ app.post('/api/bookings', async (req, res) => {
             }
         }
 
-        res.status(201).json({ message: 'Booking successful' });
+        res.status(201).json({ message: 'Booking successful', bookingId: booking._id });
     } catch (error) {
         console.error('Booking error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
 
+// Find nearest ambulance endpoint
+app.post('/api/find-nearest-ambulance', async (req, res) => {
+  try {
+    const { latitude, longitude } = req.body;
+
+    // Assuming you have a collection of available ambulances with their current locations
+    const availableAmbulances = await Ambulance.find({ status: 'available' });
+
+    if (availableAmbulances.length === 0) {
+      return res.status(404).json({ message: 'No available ambulances found' });
+    }
+
+    // Calculate distances and find the nearest ambulance
+    const nearestAmbulance = availableAmbulances.reduce((nearest, ambulance) => {
+      const distance = calculateDistance(latitude, longitude, ambulance.latitude, ambulance.longitude);
+      return (distance < nearest.distance) ? { ambulance, distance } : nearest;
+    }, { ambulance: null, distance: Infinity });
+
+    if (!nearestAmbulance.ambulance) {
+      return res.status(404).json({ message: 'No nearby ambulances found' });
+    }
+
+    res.json({
+      ambulanceId: nearestAmbulance.ambulance._id,
+      distance: nearestAmbulance.distance,
+      estimatedArrivalTime: calculateEstimatedArrivalTime(nearestAmbulance.distance)
+    });
+
+  } catch (error) {
+    console.error('Find nearest ambulance error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Helper function to calculate distance between two points
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c; // Distance in km
+}
+
+// Helper function to calculate estimated arrival time
+function calculateEstimatedArrivalTime(distance) {
+  const averageSpeed = 50; // km/h
+  const timeInHours = distance / averageSpeed;
+  return Math.round(timeInHours * 60); // Return time in minutes
+}
+
+// Accept booking endpoint for ambulance driver
+app.post('/api/accept-booking', async (req, res) => {
+    try {
+        const { bookingId, driverId, latitude, longitude } = req.body;
+
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
+            return res.status(400).json({ message: 'Booking not found' });
+        }
+
+        booking.ambulanceDriverId = driverId;
+        booking.ambulanceLatitude = latitude;
+        booking.ambulanceLongitude = longitude;
+        booking.status = 'accepted';
+        await booking.save();
+
+        res.json({ message: 'Booking accepted', booking });
+    } catch (error) {
+        console.error('Accept booking error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Update ambulance location endpoint
+app.post('/api/update-ambulance-location', async (req, res) => {
+    try {
+        const { bookingId, latitude, longitude } = req.body;
+
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
+            return res.status(400).json({ message: 'Booking not found' });
+        }
+
+        booking.ambulanceLatitude = latitude;
+        booking.ambulanceLongitude = longitude;
+        await booking.save();
+
+        res.json({ message: 'Ambulance location updated', booking });
+    } catch (error) {
+        console.error('Update ambulance location error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Fetch locations endpoint
+app.get('/api/locations/:bookingId', async (req, res) => {
+    try {
+        const { bookingId } = req.params;
+
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
+            return res.status(400).json({ message: 'Booking not found' });
+        }
+
+        res.json({
+            userLocation: {
+                latitude: booking.latitude,
+                longitude: booking.longitude
+            },
+            ambulanceLocation: {
+                latitude: booking.ambulanceLatitude,
+                longitude: booking.ambulanceLongitude
+            }
+        });
+    } catch (error) {
+        console.error('Fetch locations error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
 // Login endpoint
 app.post('/api/login', async (req, res) => {
     try {
@@ -380,3 +516,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+

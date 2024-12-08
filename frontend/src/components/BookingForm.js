@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import MapComponent from './MapComponent';
 
 const BookingForm = () => {
   const [step, setStep] = useState(1);
@@ -10,6 +11,9 @@ const BookingForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  const [ambulanceLocation, setAmbulanceLocation] = useState(null);
+  const [bookingId, setBookingId] = useState(null);
 
   const emergencyTypes = [
     { id: 'cardiac', label: 'Cardiac Arrest', icon: '🫀' },
@@ -18,6 +22,40 @@ const BookingForm = () => {
     { id: 'breathing', label: 'Breathing Problem', icon: '🫁' },
     { id: 'other', label: 'Other Emergency', icon: '🏥' },
   ];
+
+  const fetchLocations = useCallback(async () => {
+    if (!bookingId) return;
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/locations/${bookingId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error('Failed to fetch locations');
+      const data = await response.json();
+      if (data.ambulanceLocation?.latitude && data.ambulanceLocation?.longitude) {
+        setAmbulanceLocation({
+          lat: data.ambulanceLocation.latitude,
+          lng: data.ambulanceLocation.longitude
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      setError('Failed to update ambulance location. Please try again.');
+    }
+  }, [bookingId]);
+
+  useEffect(() => {
+    let intervalId;
+    if (showMap && bookingId) {
+      intervalId = setInterval(() => {
+        fetchLocations();
+      }, 5000);
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [showMap, bookingId, fetchLocations]);
 
   const handleEmergencyTypeSelect = (type) => {
     setBookingData(prev => ({ ...prev, emergencyType: type }));
@@ -37,74 +75,79 @@ const BookingForm = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        
-        // Log the coordinates for debugging
-        console.log('Obtained Location:', { latitude, longitude });
-
         setBookingData(prev => ({
           ...prev,
           latitude,
           longitude,
         }));
-        
-        // Immediately call handleBooking with updated coordinates
         handleBooking(latitude, longitude);
       },
       (error) => {
         console.error('Geolocation Error:', error);
         setError('Unable to retrieve your location. Please enable location access.');
         setLoading(false);
-      }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   };
 
   const handleBooking = async (lat, lon) => {
     try {
-      // Ensure we have both latitude and longitude
-      if (lat === null || lon === null) {
-        throw new Error('Location coordinates are missing');
-      }
-
-      // Use the latest coordinates from the function parameters
       const bookingPayload = {
         ...bookingData,
         latitude: lat,
         longitude: lon
       };
 
-      console.log('Booking Payload:', bookingPayload);
-
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify(bookingPayload)
       });
 
-      if (response.status === 201) {
-        setSuccess(true);
-        setLoading(false);
-        setStep(3);
-      } else {
-        // Try to parse error message from response
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Booking failed');
-      }
+      if (!response.ok) throw new Error('Booking failed');
+      
+      const data = await response.json();
+      setSuccess(true);
+      setLoading(false);
+      setStep(3);
+      setBookingId(data.bookingId);
+      
+      // Fetch nearest ambulance
+      const nearestAmbulanceResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/find-nearest-ambulance`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ latitude: lat, longitude: lon })
+      });
+
+      if (!nearestAmbulanceResponse.ok) throw new Error('Failed to find nearest ambulance');
+      
+      const nearestAmbulanceData = await nearestAmbulanceResponse.json();
+      setAmbulanceLocation({
+        lat: nearestAmbulanceData.latitude,
+        lng: nearestAmbulanceData.longitude
+      });
+
+      setShowMap(true);
+      fetchLocations();
     } catch (err) {
       console.error('Booking Error:', err);
-      
-      // More detailed error handling
-      setError(err.message || 'Network error. Please check your connection.');
+      setError('Failed to book ambulance. Please try again.');
       setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="bg-white text-gray-800 rounded-lg p-6 max-w-md w-full shadow-md">
+      <div className={`bg-white text-gray-800 rounded-lg p-6 max-w-md w-full shadow-md ${showMap ? 'hidden' : ''}`}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">
+          <h2 className="text-2xl font-bold text-gray-900">
             {step === 1 && 'Select Emergency Type'}
             {step === 2 && 'Location Access'}
             {step === 3 && 'Booking Confirmation'}
@@ -117,7 +160,7 @@ const BookingForm = () => {
               <button
                 key={type.id}
                 onClick={() => handleEmergencyTypeSelect(type.id)}
-                className="flex items-center gap-3 w-full p-4 text-left rounded-lg border border-gray-300 hover:bg-gray-200 transition-colors"
+                className="flex items-center gap-3 w-full p-4 text-left rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors"
               >
                 <span className="text-2xl">{type.icon}</span>
                 <span className="font-medium">{type.label}</span>
@@ -135,7 +178,7 @@ const BookingForm = () => {
             <button
               onClick={getLocation}
               disabled={loading}
-              className="w-full bg-red-600 text-white py-3 rounded-md hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-300"
+              className="w-full bg-red-600 text-white py-3 rounded-md hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed transition duration-300"
             >
               {loading ? 'Processing...' : 'Share Location & Book Now'}
             </button>
@@ -155,11 +198,35 @@ const BookingForm = () => {
               An ambulance has been dispatched to your location.
               Please stay where you are.
             </p>
+            <button
+              onClick={() => setShowMap(true)}
+              className="mt-4 w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition duration-300"
+            >
+              Track Ambulance
+            </button>
           </div>
         )}
       </div>
+
+      {showMap && bookingData.latitude !== null && bookingData.longitude !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+          <div className="w-full h-full sm:w-11/12 sm:h-5/6 bg-white rounded-lg overflow-hidden">
+            <MapComponent 
+              userLocation={{ lat: bookingData.latitude, lng: bookingData.longitude }} 
+              ambulanceLocation={ambulanceLocation}
+            />
+            <button
+              onClick={() => setShowMap(false)}
+              className="absolute top-4 right-4 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition duration-300"
+            >
+              Close Map
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default BookingForm;
+
