@@ -66,7 +66,7 @@ const bookingSchema = new mongoose.Schema({
 
 const Booking = mongoose.model('Booking', bookingSchema);
 
-// Ambulance Schema (Add this)
+// Ambulance Schema
 const ambulanceSchema = new mongoose.Schema({
     status: { type: String, required: true, default: 'available' },
     latitude: { type: Number, required: true },
@@ -75,6 +75,14 @@ const ambulanceSchema = new mongoose.Schema({
 
 const Ambulance = mongoose.model('Ambulance', ambulanceSchema);
 
+// Contact Schema
+const contactSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    message: { type: String, required: true },
+});
+
+const Contact = mongoose.model('Contact', contactSchema);
 
 // Nodemailer configuration
 const transporter = nodemailer.createTransport({
@@ -461,59 +469,68 @@ app.post('/api/reset-password', async (req, res) => {
 // Contact form endpoint
 app.post('/api/contact', async (req, res) => {
     try {
-        const { name, email, message } = req.body;
-
-        // Validate input
-        if (!name || !email || !message) {
-            return res.status(400).json({ message: 'All fields are required' });
-        }
-
-        if (!validator.isEmail(email)) {
-            return res.status(400).json({ message: 'Invalid email address' });
-        }
-
-        // Save contact message
-        const contact = new Contact({
-            name,
-            email,
-            message
-        });
-
-        await contact.save();
-
-        // Send notification email to admin
-        const emailSent = await sendEmail(
-            process.env.ADMIN_EMAIL,
-            'New Contact Form Submission',
-            `
-            <h3>New Contact Form Submission</h3>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Message:</strong> ${message}</p>
-            `
-        );
-
-        // Send confirmation email to user
-        const userEmailSent = await sendEmail(
-            email,
-            'Thank you for contacting us',
-            `
-            <h3>Thank you for reaching out!</h3>
-            <p>We have received your message and will get back to you shortly.</p>
-            <p>Your message:</p>
-            <p>${message}</p>
-            `
-        );
-
-        res.status(201).json({ message: 'Message sent successfully' });
-
+      const { name, email, message } = req.body;
+  
+      // Validate input
+      if (!name || !email || !message) {
+        return res.status(400).json({ message: 'All fields are required' });
+      }
+  
+      if (!validator.isEmail(email)) {
+        return res.status(400).json({ message: 'Invalid email address' });
+      }
+  
+      // Save contact message
+      const contact = new Contact({
+        name,
+        email,
+        message,
+      });
+  
+      await contact.save();
+  
+      // Send notification email to admin
+      const emailSent = await sendEmail(
+        process.env.ADMIN_EMAIL,
+        'New Contact Form Submission',
+        `
+        <h3>New Contact Form Submission</h3>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Message:</strong> ${message}</p>
+        `
+      );
+  
+      if (!emailSent) {
+        throw new Error('Failed to send notification email to admin');
+      }
+  
+      // Send confirmation email to user
+      const userEmailSent = await sendEmail(
+        email,
+        'Thank you for contacting us',
+        `
+        <h3>Thank you for reaching out!</h3>
+        <p>We have received your message and will get back to you shortly.</p>
+        <p>Your message:</p>
+        <p>${message}</p>
+        `
+      );
+  
+      if (!userEmailSent) {
+        throw new Error('Failed to send confirmation email to user');
+      }
+  
+      res.status(201).json({ message: 'Message sent successfully' });
+  
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+      console.error('Server error:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
     }
-});
+  });
+  
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-

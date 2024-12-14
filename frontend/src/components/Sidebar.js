@@ -15,7 +15,7 @@ const Sidebar = () => {
     { title: 'Blog', path: '/blog', icon: FaBlog },
     { title: 'Gallery', path: '/gallery', icon: FaImages },
     { title: 'Download', path: '/download', icon: FaDownload },
-    { title: 'Help Desk', path: '/helpdesk', icon: FaQuestionCircle },
+    { title: 'Contact Us', path: '/helpdesk', icon: FaQuestionCircle },
   ];
 
   const toggleSidebar = () => setIsOpen(!isOpen);

@@ -27,7 +27,7 @@ const App = () => {
     { title: 'Blog', path: '/blog' },
     { title: 'Gallery', path: '/gallery' },
     { title: 'Download', path: '/download' },
-    { title: 'Help Desk', path: '/helpdesk' },
+    { title: 'Contact Us', path: '/helpdesk' },
   ];
 
   return (

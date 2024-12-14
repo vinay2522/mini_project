@@ -1,118 +1,98 @@
-import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet-routing-machine';
-import 'leaflet/dist/leaflet.css';
-
-// Fix for default marker icon issue with Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
-// Custom marker icons using CSS classes
-const userIcon = new L.Icon({
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-  className: 'user-marker-icon'
-});
-
-const ambulanceIcon = new L.Icon({
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-red.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-  className: 'ambulance-marker-icon'
-});
-
-function MapUpdater({ userLocation, ambulanceLocation }) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (userLocation && ambulanceLocation) {
-      const bounds = L.latLngBounds(
-        L.latLng(userLocation.lat, userLocation.lng),
-        L.latLng(ambulanceLocation.lat, ambulanceLocation.lng)
-      );
-      map.fitBounds(bounds, { padding: [50, 50] });
-    } else if (userLocation) {
-      map.setView([userLocation.lat, userLocation.lng], 13);
-    }
-  }, [map, userLocation, ambulanceLocation]);
-
-  return null;
-}
+import React, { useEffect, useRef, useState } from 'react';
+import useLoadScript from './useLoadScript';
 
 const MapComponent = ({ userLocation, ambulanceLocation }) => {
   const mapRef = useRef(null);
-  const routingControlRef = useRef(null);
+  const [map, setMap] = useState(null);
+  const [directionsRenderer, setDirectionsRenderer] = useState(null);
+  const [travelInfo, setTravelInfo] = useState({ distance: '', duration: '' });
+
+  // Dynamically load the Google Maps script
+  useLoadScript(
+    `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+  );
 
   useEffect(() => {
-    if (mapRef.current && userLocation && ambulanceLocation) {
-      if (!routingControlRef.current) {
-        routingControlRef.current = L.Routing.control({
-          waypoints: [
-            L.latLng(userLocation.lat, userLocation.lng),
-            L.latLng(ambulanceLocation.lat, ambulanceLocation.lng)
-          ],
-          lineOptions: {
-            styles: [{ color: "#6FA1EC", weight: 4 }]
-          },
-          show: false,
-          addWaypoints: false,
-          routeWhileDragging: false,
-          fitSelectedRoutes: true,
-          showAlternatives: false
-        }).addTo(mapRef.current);
-      } else {
-        routingControlRef.current.setWaypoints([
-          L.latLng(userLocation.lat, userLocation.lng),
-          L.latLng(ambulanceLocation.lat, ambulanceLocation.lng)
-        ]);
-      }
-    }
+    if (!userLocation || !ambulanceLocation || !mapRef.current) return;
+
+    const initializeMap = () => {
+      if (!window.google) return; // Ensure the API is loaded
+
+      const google = window.google;
+
+      const mapInstance = new google.maps.Map(mapRef.current, {
+        center: userLocation,
+        zoom: 14,
+      });
+
+      const directionsService = new google.maps.DirectionsService();
+      const directionsDisplay = new google.maps.DirectionsRenderer();
+      directionsDisplay.setMap(mapInstance);
+
+      setMap(mapInstance);
+      setDirectionsRenderer(directionsDisplay);
+
+      calculateRoute(directionsService, directionsDisplay);
+    };
+
+    initializeMap();
   }, [userLocation, ambulanceLocation]);
 
-  const mapCenter = userLocation || [0, 0];
+  const calculateRoute = async (directionsService, directionsDisplay) => {
+    try {
+      if (!window.google) return;
+
+      const google = window.google;
+
+      const response = await directionsService.route({
+        origin: ambulanceLocation,
+        destination: userLocation,
+        travelMode: google.maps.TravelMode.DRIVING,
+      });
+
+      directionsDisplay.setDirections(response);
+
+      const distanceMatrixService = new google.maps.DistanceMatrixService();
+      distanceMatrixService.getDistanceMatrix(
+        {
+          origins: [ambulanceLocation],
+          destinations: [userLocation],
+          travelMode: google.maps.TravelMode.DRIVING,
+        },
+        (result, status) => {
+          if (status === 'OK') {
+            const element = result.rows[0].elements[0];
+            setTravelInfo({
+              distance: element.distance.text,
+              duration: element.duration.text,
+            });
+          }
+        }
+      );
+    } catch (error) {
+      console.error('Error calculating route:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (map && ambulanceLocation) {
+      map.panTo(ambulanceLocation);
+      calculateRoute(
+        new window.google.maps.DirectionsService(),
+        directionsRenderer
+      );
+    }
+  }, [ambulanceLocation]);
 
   return (
-    <MapContainer 
-      center={mapCenter} 
-      zoom={13} 
-      style={{ height: '100%', width: '100%' }}
-      whenCreated={mapInstance => { mapRef.current = mapInstance; }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
-      
-      {userLocation && (
-        <Marker 
-          position={[userLocation.lat, userLocation.lng]} 
-          icon={userIcon}
-        >
-          <Popup>Your Location</Popup>
-        </Marker>
-      )}
-      
-      {ambulanceLocation && (
-        <Marker 
-          position={[ambulanceLocation.lat, ambulanceLocation.lng]} 
-          icon={ambulanceIcon}
-        >
-          <Popup>Ambulance Location</Popup>
-        </Marker>
-      )}
-      
-      <MapUpdater userLocation={userLocation} ambulanceLocation={ambulanceLocation} />
-    </MapContainer>
+    <div className="relative w-full h-full">
+      <div ref={mapRef} className="w-full h-full" />
+      <div className="absolute top-4 left-4 bg-white p-4 shadow-lg rounded-md">
+        <h4 className="text-lg font-bold">Ambulance Tracking</h4>
+        <p>Distance: {travelInfo.distance}</p>
+        <p>ETA: {travelInfo.duration}</p>
+      </div>
+    </div>
   );
 };
 
